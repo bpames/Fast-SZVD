@@ -1,0 +1,60 @@
+%% cross_val index
+clear;clc
+oliveoil=importdata('OliveOil_TRAIN.txt'); 
+[n,p]=size(oliveoil); 
+oliveoil_obs=oliveoil(:,2:p);
+mu_train=mean(oliveoil_obs);
+sig_train=std(oliveoil_obs);
+p=p-1;
+kfold=2;
+indices=crossvalind('Kfold',n,kfold);
+num_gammas=4;
+gmults=linspace(0,1.5,4);
+sparsity_level=0.25;
+penalty=0;
+scaling=1;
+beta=3;
+tol.rel = 1e-3;
+tol.abs= 1e-3;
+maxits=100;
+quiet=1;
+val_score=zeros(kfold,1);
+D=eye(p);
+for i=1:kfold
+    Aval=oliveoil(indices==i,:);
+    Atrain=oliveoil(indices~=i,:);
+    mu=mean(Atrain(:,2:end));
+    sig=std(Atrain(:,2:end));
+    %standardize Atrain using normalize function
+    Atrain=[Atrain(:,1),normalize(Atrain(:,2:end))];
+    %standardize Aval using normalize_test function
+    Aval=[Aval(:,1),normalize_test(Aval(:,2:end),mu,sig)];
+    [~,p]=size(Atrain); 
+    p=p-1;
+    D1=eye(p);
+    [val_w{i}, DVs{i}, gamma{i}, gammas{i}, max_gamma(i),its{i}, w0{i}, x0{i}, scaler(i), val_score(i), classMeans{i}] = SZVD_Val_V2(Atrain, Aval,D1,num_gammas,gmults,sparsity_level,penalty, beta, tol, maxits,quiet);
+end
+best_ind=find(val_score==min(val_score(:)));
+%find the best gamma
+best_gamma=max_gamma(best_ind)*scaler(best_ind);
+
+%% test on the whole data set
+oliveoil=[oliveoil(:,1),normalize(oliveoil(:,2:end))];
+[DVs,its,pen_scal,N,classMeans]=SZVD_V4(oliveoil,D,penalty,tol,maxits,beta,quiet,best_gamma);
+
+%% apply to the test set
+test=importdata('OliveOil_TEST.txt'); 
+%standaize test data 
+test_class=test(:,1);
+test_obs=test(:,2:end);
+test_obs=normalize_test(test_obs,mu_train,sig_train);
+test=[test_class,test_obs];
+[stats,preds,proj,cent]=test_ZVD_V1(DVs,test,classMeans);
+
+%% make synthetic data
+clear;clc
+p=300;
+r=0.0004;
+k=3;
+N=[4,5,6]; 
+[obs,~,~]=type1_data(p,r,k,N); %size(obs)=15 301
