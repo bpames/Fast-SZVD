@@ -21,7 +21,7 @@ quiet=1;
 D=eye(p);
 
 %time the new version
-tic;
+
 %standaize train and test data 
 train=[train(:,1),normalize(train(:,2:end))];
 train_obs=train(:,2:end);
@@ -32,11 +32,12 @@ test_obs=test(:,2:end);
 test_obs=normalize_test(test_obs,mu_train,sig_train);
 test=[test_class,test_obs];
 mc_1=zeros(1,T);
+tic;
 for t=1:T
     [DVs,its,pen_scal,N,classMeans]=SZVD_V4(train,D,penalty,tol,maxits,beta,quiet,gamma);
     [stats,preds,proj,cent]=test_ZVD_V1(DVs,test,classMeans);
     
-    preds
+   %preds;
 end
 t1=toc;
 
