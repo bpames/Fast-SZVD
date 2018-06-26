@@ -6,8 +6,8 @@ function [t1,t2]=time_compare(p,r,k,N,T)
 %T: number of trials for p
 
 %prepare the data set
-[obs,~,~]=type1_data(p,r,k,N)
-[train,test]=train_test_split(obs,0.8)
+[obs,~,~]=type1_data(p,r,k,N);
+[train,test]=train_test_split(obs,0.8);
 [~,p]=size(train); 
 p=p-1;
 gamma=0.03;
