@@ -22,7 +22,7 @@ cent=w'*classMeans;
 dist=zeros(N,K);
 for i=1:N
     for j=1:K
-        dist(i,j)=norm(proj(:,i)-cent(:,j))
+        dist(i,j)=norm(proj(:,i)-cent(:,j));
     end
 end
 %Label test_obs accoring to the closest centroid to its projection
@@ -31,6 +31,8 @@ end
 %Compute fraction of misclassified observations
 misclassed=sum(abs(test_labels-predicted_labels)>0)/N;
 %l0
+A=(abs(w)>1e-3);
+sum(A)
 l0=sum(abs(w)>1e-3); %l0 is the number of non-zero entries
 %l1
 l1=sum(abs(w));
