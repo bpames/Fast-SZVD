@@ -7,7 +7,7 @@ function [obs,mu,sigma]=type1_data(p,r,k,N)
 %set size of diagonal blocks of sigma
 l=100;
 
-%initialize mean vectorrs mu and covariance matrix sigma
+%initialize mean vectors mu and covariance matrix sigma
 mu=zeros(p,k);
  
 

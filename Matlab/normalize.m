@@ -1,4 +1,4 @@
-function x=normalize(x)
+function [x, mu, sig] = normalize(x)
 [n,~]=size(x);
 x=x-ones(n,1)*mean(x);
 sig=std(x);

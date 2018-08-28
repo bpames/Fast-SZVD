@@ -89,7 +89,7 @@ for iter=1:maxits
     
     % K > 2.
     % Update using by solving the system LL'x = b.
-    xtmp=P\(R*N*b);
+    xtmp=P\(R*(N*b));
     xtmp=L\(xtmp);
     x=1/beta*b+1/beta^2*(N'*R')*xtmp;
     
