@@ -2,7 +2,7 @@ function [DVs,its,pen_scal,N,classMeans]=SZVD_V4(train,D,penalty,tol,maxits,beta
 %Normalize the training data
 get_DVs=1;
 classes=train(:,1);
-[~,p]=size(train);
+[n,p]=size(train);
 X=train(:,2:p);
 %X=normalize(X);
 %Extract observations 
@@ -15,7 +15,7 @@ ClassMeans=zeros(p,K);
 w=zeros(p,K-1);
 %for each class, make an object in the list containing only the obs of that
 %class and update the between and within-class sample
-M=[];
+M=zeros(p,n);
 for i=1:K
     class_obs=X(classes==labels(i),:);
     %Get the number of obs in that class (the number of rows)
@@ -24,7 +24,7 @@ for i=1:K
     classMeans(:,i)=mean(class_obs);
     %Update W 
     xj=class_obs-ones(ni,1)*classMeans(:,i)';
-    M=[M,xj'];
+    M(:,i) =xj';
     ClassMeans(:,i)=mean(class_obs)*sqrt(ni);
 end
 
@@ -57,15 +57,16 @@ for i=1:(K-1)
     sols0.x = w;
     sols0.y = D*N*w;
     sols0.z = zeros(p,1);
-    [x,~,~,its]=SZVD_ADMM_V(R,N,D,sols0,s,gamma,beta,tol,maxits,quiet);
-    DVs(:,i)=D*N*x;
+    [x,y,~,its]=SZVD_ADMM_V(R,N,D,sols0,s,gamma,beta,tol,maxits,quiet);
+    DVs(:,i) = y/norm(y);
+    %DVs(:,i)=D*N*x;
     its(i)=its;
     if (quiet == 0)          
         fprintf('Found SZVD %g after %g its \n', i, its(i));
     end
     if(i<(K-1))
         %Project N onto orthogonal complement of Nx 
-        x=DVs(:,i);
+        x=D*(N*x);
         x=x/norm(x);
         N=Nupdate(N,x);
         [~,sigma,w]=svd(R*N);
