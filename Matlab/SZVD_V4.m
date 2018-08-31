@@ -27,6 +27,9 @@ for i=1:K
     M=[M,xj'];
     ClassMeans(:,i)=mean(class_obs)*sqrt(ni);
 end
+
+size(M)
+
 %Symmetrize W and B
 R=ClassMeans';
 %Find ZVDs 

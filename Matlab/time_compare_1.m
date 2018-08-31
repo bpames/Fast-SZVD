@@ -27,7 +27,7 @@ for i=1:length(p)
         
         % Generate  and process (i,j)th training data.                        
         train = type1_data(p(i),r,k,N(i)); 
-        [mu_train, sig_train, train_obs] = normalize(train(:,2:(p(i)+1)));
+        [train_obs, mu_train, sig_train] = normalize(train(:,2:(p(i)+1)));
         train=[train(:,1), train_obs];
         
 %         train=[train(:,1),normalize(train(:,2:end))];
