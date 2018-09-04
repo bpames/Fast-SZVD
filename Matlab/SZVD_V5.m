@@ -15,7 +15,7 @@ ClassMeans=zeros(p,K);
 w=zeros(p,K-1);
 %for each class, make an object in the list containing only the obs of that
 %class and update the between and within-class sample
-M=[];
+M=zeros(p,n);
 for i=1:K
     class_obs=X(classes==labels(i),:);
     %Get the number of obs in that class (the number of rows)
@@ -24,7 +24,7 @@ for i=1:K
     classMeans(:,i)=mean(class_obs);
     %Update W 
     xj=class_obs-ones(ni,1)*classMeans(:,i)';
-    M =[M,xj'];
+    M(:,i) =xj';
     ClassMeans(:,i)=mean(class_obs)*sqrt(ni);
 end
 
