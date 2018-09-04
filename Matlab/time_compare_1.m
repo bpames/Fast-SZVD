@@ -1,4 +1,4 @@
-function [time1,time2]=time_compare_1(p,r,k,N,Ntest, T)
+function [time1,time2, NumErr1, NumErr2, NumFeat1, NumFeat2]=time_compare_1(p,r,k,N,Ntest, T)
 %p: vector of number of features
 %r: value of constant covariance between features
 %k: number of classes
@@ -7,7 +7,7 @@ function [time1,time2]=time_compare_1(p,r,k,N,Ntest, T)
 %T: number of trials for p
 
 %prepare the data set
-gamma=0.03;
+gamma=1e-8;
 penalty=0;
 scaling=1;
 beta=3;

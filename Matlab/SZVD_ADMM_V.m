@@ -32,6 +32,18 @@ function [x,y,z,its, errtol] = SZVD_ADMM_V(R, N, D, sols0,pen_scal, gamma, beta,
 % Dimension of decision variables.
 p = size(D, 1);
 
+% Check if D is diagonal.
+dD = isdiag(D);
+
+% Define d operators.
+if isdiag(D)
+    Dx = @(x) diag(D).*x; % diagonal scaling is D is diagonal.
+    Dtx = @(x) diag(D).*x; 
+else
+    Dx = @(x) D*x;
+    Dtx = @(x) D'*x;
+end
+
 %====================================================================
 % Initialize x solution and constants for x update.
 %====================================================================
@@ -59,8 +71,7 @@ z = sols0.z;
 %% Call the algorithm.
 %====================================================================
 
-for iter=1:maxits
-    
+for iter=1:maxits    
     
     %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     % Step 1: Perform shrinkage to update y_k+1.
@@ -70,7 +81,7 @@ for iter=1:maxits
     yold = y;
     
     % Call soft-thresholding.  
-    y = vec_shrink(beta*D*(N*x) + z, (gamma * pen_scal)');
+    y = vec_shrink(beta*Dx(N*x) + z, (gamma * pen_scal)');
     
     
     % Normalize y (if necessary).
@@ -85,7 +96,7 @@ for iter=1:maxits
     %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     
     % Compute RHS.
-    b = N'*D'*(beta*y - z);
+    b = N'*Dtx(beta*y - z);
     
     % K > 2.
     % Update using by solving the system LL'x = b.
@@ -101,7 +112,7 @@ for iter=1:maxits
     % (according to the formula z_k+1 = z_k + beta*(N*x_k+1 - y_k+1) ).
     %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     %zold = z;
-    z = real(z + beta*(D*(N*x) - y));
+    z = real(z + beta*(Dx(N*x) - y));
     
     %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     % Check stopping criteria.
@@ -111,7 +122,7 @@ for iter=1:maxits
     % Primal constraint violation.
     %----------------------------------------------------------------
     % Primal residual.
-    r = D*(N*x) - y;    
+    r = Dx(N*x) - y;    
     % l2 norm of the residual.
     dr = norm(r);
 	

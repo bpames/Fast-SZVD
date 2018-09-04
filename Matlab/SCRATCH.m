@@ -18,9 +18,9 @@ T = 3;
 
 %% TEST TIME COMPARE 1.
 k = 4;
-p = [500];
+p = [1000];
 N = 50*ones(k,length(p));
 Ntest = 100*ones(k, length(p));
 T = 1;
 
-[time1,time2]=time_compare_1(p,r,k,N,Ntest, T);
+[time1,time2, err1, err2, feat1, feat2]=time_compare_1(p,r,k,N,Ntest, T);
