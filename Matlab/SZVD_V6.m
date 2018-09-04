@@ -1,4 +1,4 @@
-function [DVs,its,pen_scal,N,classMeans]=SZVD_V5(train,D,penalty,tol,maxits,beta,quiet,gamma)
+function [DVs,its,pen_scal,N,classMeans]=SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gamma)
 %Normalize the training data
 get_DVs=1;
 
