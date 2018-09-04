@@ -1,4 +1,4 @@
-function [DVs,its,pen_scal,N,classMeans]=SZVD_V4(train,D,penalty,tol,maxits,beta,quiet,gamma)
+function [DVs,its,pen_scal,N,classMeans]=SZVD_V5(train,D,penalty,tol,maxits,beta,quiet,gamma)
 %Normalize the training data
 get_DVs=1;
 classes=train(:,1);
@@ -16,7 +16,7 @@ w=zeros(p,K-1);
 %for each class, make an object in the list containing only the obs of that
 %class and update the between and within-class sample
 M=zeros(p,n);
-for i=1:K
+for i=1:K    
     class_obs=X(classes==labels(i),:);
     %Get the number of obs in that class (the number of rows)
     ni=size(class_obs,1);
@@ -24,7 +24,7 @@ for i=1:K
     classMeans(:,i)=mean(class_obs);
     %Update W 
     xj=class_obs-ones(ni,1)*classMeans(:,i)';
-    M(:,i) =xj';
+    M(:,classes == labels(i)) =xj';
     ClassMeans(:,i)=mean(class_obs)*sqrt(ni);
 end
 
