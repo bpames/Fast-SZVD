@@ -18,7 +18,7 @@ T = 3;
 
 %% TEST TIME COMPARE 1.
 k = 4;
-p = [1000];
+p = [500];
 N = 50*ones(k,length(p));
 Ntest = 100*ones(k, length(p));
 T = 1;

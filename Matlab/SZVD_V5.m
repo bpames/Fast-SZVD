@@ -1,6 +1,11 @@
 function [DVs,its,pen_scal,N,classMeans]=SZVD_V5(train,D,penalty,tol,maxits,beta,quiet,gamma)
 %Normalize the training data
 get_DVs=1;
+
+st = 0;
+ntime = 0;
+
+tic
 classes=train(:,1);
 [n,p]=size(train);
 X=train(:,2:p);
@@ -41,6 +46,10 @@ if (get_DVs==1)
     R=R/sigma(1,1);
     %gamma=0.5/norm((D*N*w),1);
 end
+
+ppt = toc;
+fprintf('ppt %1.4d \n', ppt)
+
 %Set sigma--penalty parameter
 if (penalty==1)
     s=sqrt(diag(M*M'));
@@ -53,16 +62,21 @@ its=zeros(1,K-1);
 %Call ADMM
 for i=1:(K-1)
     %Initial solutions.
+    tic
     sols0.x = w;
     sols0.y = D*(N*w);
     sols0.z = zeros(p,1);
     [x,y,~,its]=SZVD_ADMM_V(R,N,D,sols0,s,gamma,beta,tol,maxits,quiet);
     DVs(:,i) = y/norm(y);
+    st = st + toc;
+    fprintf('solve time %1.4d \n', st)
     %DVs(:,i)=D*N*x;
     its(i)=its;
     if (quiet == 0)          
         fprintf('Found SZVD %g after %g its \n', i, its(i));
     end
+    
+    tic
     if(i<(K-1))
         %Project N onto orthogonal complement of Nx 
         x=D*(N*x);
@@ -73,6 +87,9 @@ for i=1:(K-1)
         R=R/sigma(1,1);
         %gamma=0.5/norm((D*N*w),1);
     end
+    ntime = ntime + toc;
+    fprintf('Nt %1.4d \n', ntime)
+    
 end
 pen_scal=s;
 end

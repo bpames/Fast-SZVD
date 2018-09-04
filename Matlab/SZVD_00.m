@@ -25,6 +25,10 @@ its=zeros(1,K-1);
 ppt = toc;
 fprintf('ppt %1.4d \n', ppt)
 %Call ADMM
+
+ntime =0;
+st = 0;
+
 for i=1:(K-1)
     %Initial solutions.
     tic
@@ -32,7 +36,7 @@ for i=1:(K-1)
     sols0.y = w0.dvs(:,i);
     sols0.z = zeros(p,1);
     [x,~,~,its]=SZVD_ADMM(B0,N,D,sols0,s,gamma,beta,tol,maxits,quiet);
-    st = toc;
+    st =  st + toc;
     fprintf('solve time %1.4d \n', st)
     DVs(:,i)=D*N*x;
     its(i)=its;
@@ -53,7 +57,7 @@ for i=1:(K-1)
         B0=N'*w0.B*N;
         B0=0.5*(B0+B0');
     end
-    ntime = toc;
+    ntime = ntime + toc;
     fprintf('Nt %1.4d \n', ntime)
 end
 pen_scal=s;

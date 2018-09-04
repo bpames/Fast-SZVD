@@ -41,6 +41,7 @@ for i=1:length(p)
 %         sig_train=std(train_obs);
         
     %fprintf('new')
+    fprintf('+++++++++++++++++++++++++++++++++++\n')
         % Solve using new version and record cpu time.
         tic;
         [DVs,~,~,~,classMeans] = SZVD_V5(train,D,penalty,tol,maxits,beta,quiet,gamma);
@@ -58,6 +59,11 @@ for i=1:length(p)
         NumErr1(j,i)=stats.mc;
         NumFeat1(j,i)=sum(stats.l0);
         
+        fprintf('-----------------------------------\n')
+        fprintf('Total new %1.4f \n', time1(j,i))
+        
+        fprintf('+++++++++++++++++++++++++++++++++++\n')
+        
         %fprintf('old')
         %Repeat using the old code and save results to remaining matrices.
         tic;
@@ -68,6 +74,9 @@ for i=1:length(p)
         [stats, ~] = test_ZVD_V1(DVs2,test,classMeans);
         NumErr2(j,i)=stats.mc;
         NumFeat2(j,i)=sum(stats.l0);
+        
+        fprintf('-----------------------------------\n')
+        fprintf('Total old %1.4f \n', time2(j,i))
     end
 end
 
