@@ -3,6 +3,7 @@ function [DVs,its,pen_scal,N,classMeans,mus]=SZVD_00(train,gamma,D,penalty,scali
 get_DVs=1;
 [~,p]=size(train); 
 p=p-1;
+tic
 w0 = ZVD(train, scaling, get_DVs);
 classMeans=w0.means;
 mus=w0.mu;
@@ -20,18 +21,25 @@ K=w0.k;
 %Initialization for the output
 DVs=zeros(p,K-1);
 its=zeros(1,K-1);
+
+ppt = toc;
+fprintf('ppt %1.4d \n', ppt)
 %Call ADMM
 for i=1:(K-1)
     %Initial solutions.
+    tic
     sols0.x = N'*D'*w0.dvs(:,i);
     sols0.y = w0.dvs(:,i);
     sols0.z = zeros(p,1);
     [x,~,~,its]=SZVD_ADMM(B0,N,D,sols0,s,gamma,beta,tol,maxits,quiet);
+    st = toc;
+    fprintf('solve time %1.4d \n', st)
     DVs(:,i)=D*N*x;
     its(i)=its;
     if (quiet == 0)          
         fprintf('Found SZVD %g after %g its \n', i, its(i));
     end
+    tic
     if(i<(K-1))
         %Project N onto orthogonal complement of Nx 
         x=DVs(:,i);
@@ -45,6 +53,8 @@ for i=1:(K-1)
         B0=N'*w0.B*N;
         B0=0.5*(B0+B0');
     end
+    ntime = toc;
+    fprintf('Nt %1.4d \n', ntime)
 end
 pen_scal=s;
 end

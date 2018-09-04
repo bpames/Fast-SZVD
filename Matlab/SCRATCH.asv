@@ -1,7 +1,7 @@
 % TESTING TYPE 1 DATA
 
-p = 500;
-r = 0.25;
+p = 1500;
+r = 0.5;
 k = 4;
 N = 100*ones(k,1);
 
@@ -17,10 +17,6 @@ T = 3;
 [t1,t2]=time_compare(p,r,k,N,T);
 
 %% TEST TIME COMPARE 1.
-k = 4;
-p = [1000];
-N = 50*ones(k,length(p));
-Ntest = 100*ones(k, length(p));
-T = 1;
-
-[time1,time2]=time_compare_1(p,r,k,N,Ntest, T);
+p = [500; 1000; 1500];
+N = 10*ones(3,1);
+Ntest

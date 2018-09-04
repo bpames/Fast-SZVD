@@ -1,5 +1,5 @@
 function [t1,t2]=time_compare(p,r,k,N,T)
-%p: number of features
+%p: vector of number of features
 %r: value of constant covariance between features
 %k: number of classes
 %N: vector of number of observations per class
@@ -34,7 +34,7 @@ test=[test_class,test_obs];
 mc_1=zeros(1,T);
 tic;
 for t=1:T
-    [DVs,its,pen_scal,N,classMeans]=SZVD_V4(train,D,penalty,tol,maxits,beta,quiet,gamma);
+    [DVs,its,pen_scal,N,classMeans]=SZVD_V5(train,D,penalty,tol,maxits,beta,quiet,gamma);
     [stats,preds,proj,cent]=test_ZVD_V1(DVs,test,classMeans);
     
    %preds;

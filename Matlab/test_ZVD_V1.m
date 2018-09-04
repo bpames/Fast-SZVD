@@ -32,7 +32,7 @@ end
 misclassed=sum(abs(test_labels-predicted_labels)>0)/N;
 %l0
 A=(abs(w)>1e-3);
-sum(A)
+sum(A);
 l0=sum(abs(w)>1e-3); %l0 is the number of non-zero entries
 %l1
 l1=sum(abs(w));

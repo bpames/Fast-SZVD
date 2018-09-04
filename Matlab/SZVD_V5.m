@@ -16,6 +16,7 @@ w=zeros(p,K-1);
 %for each class, make an object in the list containing only the obs of that
 %class and update the between and within-class sample
 M=zeros(p,n);
+
 for i=1:K    
     class_obs=X(classes==labels(i),:);
     %Get the number of obs in that class (the number of rows)
@@ -27,8 +28,6 @@ for i=1:K
     M(:,classes == labels(i)) =xj';
     ClassMeans(:,i)=mean(class_obs)*sqrt(ni);
 end
-
-size(M)
 
 %Symmetrize W and B
 R=ClassMeans';
@@ -55,7 +54,7 @@ its=zeros(1,K-1);
 for i=1:(K-1)
     %Initial solutions.
     sols0.x = w;
-    sols0.y = D*N*w;
+    sols0.y = D*(N*w);
     sols0.z = zeros(p,1);
     [x,y,~,its]=SZVD_ADMM_V(R,N,D,sols0,s,gamma,beta,tol,maxits,quiet);
     DVs(:,i) = y/norm(y);

@@ -19,7 +19,9 @@ end
 
 %form the covariance matrix sigma
 sigma=r*ones(p,p);
-sigma(logical(eye(p)))=1;
+sdiag = diag(sigma);
+sigma = eye(p) + sigma - diag(sdiag);
+%sigma(logical(eye(p)))=1;
 
 %generate sum(N) observations using mu and sigma
 %initialize observation matrix
