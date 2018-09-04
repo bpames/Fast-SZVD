@@ -26,10 +26,19 @@ T = 1;
 [time1,time2, err1, err2, feat1, feat2]=time_compare_1(p,r,k,N,Ntest, T);
 
 %% Debug old SZVD.
+
 % Generate  and process (i,j)th training data.                        
-train = type1_data(p(i),r,k,N(:, i)); 
-[train_obs, mu_train, sig_train] = normalize(train(:,2:(p(i)+1)));
+p = 500;
+k = 3;
+N = 50*ones(k,length(p));
+Ntest = 100*ones(k, length(p));
+r = 0.5;
+
+train = type1_data(p,r,k,N); 
+[train_obs, mu_train, sig_train] = normalize(train(:,2:(p+1)));
 train=[train(:,1), train_obs];
+
+%% Set up problem using new code.
 
 % Process using steps in SZVD_V6
 classes=train(:,1);
@@ -64,13 +73,52 @@ end
 R=ClassMeans';
 %Find ZVDs 
 N=null(M');
-if (get_DVs==1)
-    %Compute k-1 nontrivial e-vectors of N'*B*N
-    RN = R*N;
-    size(RN)
-    [~,sigma,w]=svd(R*N);
-    w=w(:,1);
-    %calculate gamma
-    R=R/sigma(1,1);
-    %gamma=0.5/norm((D*N*w),1);
-end
+
+%Compute k-1 nontrivial e-vectors of N'*B*N
+RN = R*N;
+%size(RN)
+[~,sigma,w]=svd(RN);
+w=w(:,1);
+%calculate gamma
+R=R/sigma(1,1);
+RN = RN/sigma(1,1);
+%gamma=0.5/norm((D*N*w),1);
+
+
+Anew = RN'*RN;
+
+%% Set up problem with old code.
+scaling = 1;
+get_DVs = 1;
+
+w0 = ZVD(train, scaling, get_DVs);
+classMeans=w0.means;
+mus=w0.mu;
+
+s=ones(p,1);
+w0.s=s;
+%w0.B = 1/2*(w0.B + w0.B');
+B0 = (w0.N' * w0.B * w0.N)/(d1'*w0.B*d1);
+
+%B0 = (B0+B0')/2;
+N = w0.N;
+K=w0.k;
+
+%% Problem parameters.
+%prepare the data set
+gamma=1e-10;
+penalty=0;
+scaling=1;
+beta=3;
+tol.rel = 1e-5;
+tol.abs= 1e-5;
+maxits=100;
+quiet=0;
+D = eye(p);
+
+%% Call new solver.
+[DVs,x,~,~,~,classMeans] = SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gamma);
+
+%% Call old solver.
+[DVs2,~,~,~,~,~]=SZVD_00(train,gamma,D,penalty,scaling,tol,maxits,beta,quiet);
+

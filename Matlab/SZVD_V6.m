@@ -1,11 +1,11 @@
-function [DVs,its,pen_scal,N,classMeans]=SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gamma)
+function [DVs,x, its,pen_scal,N,classMeans]=SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gamma)
 %Normalize the training data
 get_DVs=1;
 
-st = 0;
-ntime = 0;
+% st = 0;
+% ntime = 0;
 
-tic
+% tic
 classes=train(:,1);
 [n,p]=size(train);
 X=train(:,2:p);
@@ -41,16 +41,16 @@ N=null(M');
 if (get_DVs==1)
     %Compute k-1 nontrivial e-vectors of N'*B*N
     RN = R*N;
-    size(RN)
-    [~,sigma,w]=svd(R*N);
+    %size(RN)
+    [~,sigma,w]=svd(RN);
     w=w(:,1);
     %calculate gamma
     R=R/sigma(1,1);
     %gamma=0.5/norm((D*N*w),1);
 end
 
-ppt = toc;
-fprintf('ppt %1.4d \n', ppt)
+% ppt = toc;
+% fprintf('ppt %1.4d \n', ppt)
 
 %Set sigma--penalty parameter
 if (penalty==1)
@@ -64,21 +64,21 @@ its=zeros(1,K-1);
 %Call ADMM
 for i=1:(K-1)
     %Initial solutions.
-    tic
+%     tic
     sols0.x = w;
     sols0.y = D*(N*w);
     sols0.z = zeros(p,1);
     [x,y,~,its]=SZVD_ADMM_V2(R,N,RN, D,sols0,s,gamma,beta,tol,maxits,quiet);
     DVs(:,i) = y/norm(y);
-    st = st + toc;
-    fprintf('solve time %1.4d \n', st)
+%     st = st + toc;
+%     fprintf('solve time %1.4d \n', st)
     %DVs(:,i)=D*N*x;
     its(i)=its;
     if (quiet == 0)          
         fprintf('Found SZVD %g after %g its \n', i, its(i));
     end
     
-    tic
+%     tic
     if(i<(K-1))
         %Project N onto orthogonal complement of Nx 
         x=D*(N*x);
@@ -90,8 +90,8 @@ for i=1:(K-1)
         R=R/sigma(1,1);
         %gamma=0.5/norm((D*N*w),1);
     end
-    ntime = ntime + toc;
-    fprintf('Nt %1.4d \n', ntime)
+%     ntime = ntime + toc;
+%     fprintf('Nt %1.4d \n', ntime)
     
 end
 pen_scal=s;

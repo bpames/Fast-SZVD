@@ -15,7 +15,9 @@ end
 w0.s=s;
 %w0.B = 1/2*(w0.B + w0.B');
 B0 = w0.N' * w0.B * w0.N;
-%B0 = (B0+B0')/2;
+d1 = w0.dvs(:,1);
+B0 = (w0.N' * w0.B * w0.N)/(d1'*w0.B*d1);
+B0 = (B0+B0')/2;
 N = w0.N;
 K=w0.k;
 %Initialization for the output
@@ -39,6 +41,7 @@ for i=1:(K-1)
     st =  st + toc;
     fprintf('solve time %1.4d \n', st)
     DVs(:,i)=D*N*x;
+    DVs(:,i) = DVs(:,i)/norm(DVs(:,i));
     its(i)=its;
     if (quiet == 0)          
         fprintf('Found SZVD %g after %g its \n', i, its(i));
