@@ -40,6 +40,8 @@ R=ClassMeans';
 N=null(M');
 if (get_DVs==1)
     %Compute k-1 nontrivial e-vectors of N'*B*N
+    RN = R*N;
+    size(RN)
     [~,sigma,w]=svd(R*N);
     w=w(:,1);
     %calculate gamma
@@ -66,7 +68,7 @@ for i=1:(K-1)
     sols0.x = w;
     sols0.y = D*(N*w);
     sols0.z = zeros(p,1);
-    [x,y,~,its]=SZVD_ADMM_V(R,N,D,sols0,s,gamma,beta,tol,maxits,quiet);
+    [x,y,~,its]=SZVD_ADMM_V2(R,N,RN, D,sols0,s,gamma,beta,tol,maxits,quiet);
     DVs(:,i) = y/norm(y);
     st = st + toc;
     fprintf('solve time %1.4d \n', st)
@@ -82,7 +84,8 @@ for i=1:(K-1)
         x=D*(N*x);
         x=x/norm(x);
         N=Nupdate(N,x);
-        [~,sigma,w]=svd(R*N);
+        RN = R*N;
+        [~,sigma,w]=svd(RN);
         w=w(:,1);
         R=R/sigma(1,1);
         %gamma=0.5/norm((D*N*w),1);

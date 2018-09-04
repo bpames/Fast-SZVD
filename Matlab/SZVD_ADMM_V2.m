@@ -1,4 +1,4 @@
-function [x,y,z,its, errtol] = SZVD_ADMM_V(R, N, D, sols0,pen_scal, gamma, beta, tol, maxits, quiet)
+function [x,y,z,its, errtol] = SZVD_ADMM_V2(R, N, RN, D, sols0,pen_scal, gamma, beta, tol, maxits, quiet)
 
 % Iteratively solves the problem
 %       min{-1/2*x'B'x + gamma p(y): l2(x) <= 1, DNx = y}
@@ -8,6 +8,7 @@ function [x,y,z,its, errtol] = SZVD_ADMM_V(R, N, D, sols0,pen_scal, gamma, beta,
 %====================================================================
 %   R: Matrix stores the class means, i.e. R=classMeans'.
 %   N: basis matrix for null space of covariance matrix W.
+%   RN: product of RN used repeatedly.
 %   D: penalty dictionary/basis.
 %   sols0: initial solutions sols0.x, sols0.y, sols0.z
 %   pen_scal: penalty scaling term.
@@ -32,9 +33,6 @@ function [x,y,z,its, errtol] = SZVD_ADMM_V(R, N, D, sols0,pen_scal, gamma, beta,
 % Dimension of decision variables.
 p = size(D, 1);
 
-% Check if D is diagonal.
-dD = isdiag(D);
-
 % Define d operators.
 if isdiag(D)
     Dx = @(x) diag(D).*x; % diagonal scaling is D is diagonal.
@@ -43,6 +41,10 @@ else
     Dx = @(x) D*x;
     Dtx = @(x) D'*x;
 end
+
+% RN product.
+% RN = R*N;
+% size(RN)
 
 %====================================================================
 % Initialize x solution and constants for x update.
@@ -54,7 +56,7 @@ x = sols0.x;
  % Take Cholesky of beta I - B (for use in update of x)
 %V=chol(eye(K)-1/beta*R*(N*N')*R','upper');
 %[V1,V2] = qr(eye(K)-1/beta*R*(N*N')*R');
-[P,L] = lu(eye(K)-1/beta*R*(N*N')*R');
+[P,L] = lu(eye(K)-1/beta*RN*RN');
 
 
 %====================================================================
@@ -100,9 +102,9 @@ for iter=1:maxits
     
     % K > 2.
     % Update using by solving the system LL'x = b.
-    xtmp=P\(R*(N*b));
+    xtmp=P\(RN*b);
     xtmp=L\(xtmp);
-    x=1/beta*b+1/beta^2*(N'*R')*xtmp;
+    x=1/beta*b+1/beta^2*RN'*xtmp;
     
     % Truncate complex part (if have +0i terms appearing.)
     x = real(x);

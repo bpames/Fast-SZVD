@@ -44,7 +44,7 @@ for i=1:length(p)
     fprintf('+++++++++++++++++++++++++++++++++++\n')
         % Solve using new version and record cpu time.
         tic;
-        [DVs,~,~,~,classMeans] = SZVD_V5(train,D,penalty,tol,maxits,beta,quiet,gamma);
+        [DVs,~,~,~,classMeans] = SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gamma);
         time1(j, i) =toc; % Stop timer after training is finished.
         
         %fprintf('new-test')
