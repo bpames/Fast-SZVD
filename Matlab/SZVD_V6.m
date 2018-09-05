@@ -1,6 +1,8 @@
-function [DVs,x, its,pen_scal,N,classMeans]=SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gamma)
+function [DVs,x, its,pen_scal,N,classMeans, gamma]=SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gamscale)
+
 %Normalize the training data
 get_DVs=1;
+
 
 % st = 0;
 % ntime = 0;
@@ -17,7 +19,10 @@ K=length(labels);
 p=p-1;
 classMeans=zeros(p,K);
 ClassMeans=zeros(p,K);
-w=zeros(p,K-1);
+
+% Initialize gamma.
+gamma = zeros(K-1,1);
+
 %for each class, make an object in the list containing only the obs of that
 %class and update the between and within-class sample
 M=zeros(p,n);
@@ -44,9 +49,12 @@ if (get_DVs==1)
     %size(RN)
     [~,sigma,w]=svd(RN);
     w=w(:,1);
-    %calculate gamma
+    % normalize R.
     R=R/sigma(1,1);
-    %gamma=0.5/norm((D*N*w),1);
+    RN = RN/sigma(1,1);
+    
+    % Set gamma.
+    gamma(1)=gamscale*norm(RN*w,2)^2/norm((D*N*w),1)
 end
 
 % ppt = toc;
@@ -68,7 +76,7 @@ for i=1:(K-1)
     sols0.x = w;
     sols0.y = D*(N*w);
     sols0.z = zeros(p,1);
-    [x,y,~,its]=SZVD_ADMM_V2(R,N,RN, D,sols0,s,gamma,beta,tol,maxits,quiet);
+    [x,y,~,its]=SZVD_ADMM_V2(R,N,RN, D,sols0,s,gamma(i),beta,tol,maxits,quiet);
     DVs(:,i) = y/norm(y);
 %     st = st + toc;
 %     fprintf('solve time %1.4d \n', st)
@@ -88,7 +96,8 @@ for i=1:(K-1)
         [~,sigma,w]=svd(RN);
         w=w(:,1);
         R=R/sigma(1,1);
-        %gamma=0.5/norm((D*N*w),1);
+        % Set gamma.
+        gamma(i+1)=gamscale*norm(RN*w,2)^2/norm((D*N*w),1);
     end
 %     ntime = ntime + toc;
 %     fprintf('Nt %1.4d \n', ntime)

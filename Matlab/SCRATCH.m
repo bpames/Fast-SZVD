@@ -106,7 +106,7 @@ K=w0.k;
 
 %% Problem parameters.
 %prepare the data set
-gamma=1e-10;
+gammascale=0.5;
 penalty=0;
 scaling=1;
 beta=3;
@@ -117,8 +117,11 @@ quiet=0;
 D = eye(p);
 
 %% Call new solver.
-[DVs,x,~,~,~,classMeans] = SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gamma);
-
+[DVs,x,~,~,~,classMeans,gamma] = SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gammascale);
+plot(DVs)
+nnz(DVs)
 %% Call old solver.
 [DVs2,~,~,~,~,~]=SZVD_00(train,gamma,D,penalty,scaling,tol,maxits,beta,quiet);
 
+plot(DVs2)
+nnz(DVs2)

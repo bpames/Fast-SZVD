@@ -37,7 +37,7 @@ for i=1:(K-1)
     sols0.x = N'*D'*w0.dvs(:,i);
     sols0.y = w0.dvs(:,i);
     sols0.z = zeros(p,1);
-    [x,~,~,its]=SZVD_ADMM(B0,N,D,sols0,s,gamma,beta,tol,maxits,quiet);
+    [x,~,~,its]=SZVD_ADMM(B0,N,D,sols0,s,gamma(i),beta,tol,maxits,quiet);
     st =  st + toc;
     fprintf('solve time %1.4d \n', st)
     DVs(:,i)=D*N*x;

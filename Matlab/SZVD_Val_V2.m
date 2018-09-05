@@ -100,9 +100,8 @@ for i=1:num_gammas
     end
     %Get performance scores on the validation set
     %Call test ZVD to get predictions
-    [stats,~,proj,cent]=test_ZVD_V1(DVs(:,:,i), Aval, classMeans);%%%%%%%%%%%%%
-    proj
-    cent
+    [stats,~,proj,cent]=test_ZVD_V1(DVs(:,:,i), Aval, classMeans);%
+    %%%%%%%%%%%%
     %If gamma gives trivial sol, give it a large penalty
     if (sum(stats.l0)<3)
         val_score(i)=100*size(Aval,1);
