@@ -32,11 +32,13 @@ function [x,y,z,its, errtol] = SZVD_ADMM(B,  N, D, sols0, pen_scal, gamma, beta,
 % Dimension of decision variables.
 p = size(D, 1);
 
-% Compute D*N.
-if D == eye(p)
-    DN = N;
+% Define d operators.
+if isdiag(D)
+    Dx = @(x) diag(D).*x; % diagonal scaling is D is diagonal.
+    Dtx = @(x) diag(D).*x; 
 else
-    DN = D*N;
+    Dx = @(x) D*x;
+    Dtx = @(x) D'*x;
 end
 
 
@@ -95,7 +97,7 @@ for iter=1:maxits
     yold = y;
     
     % Call soft-thresholding.      
-    y = vec_shrink(beta*DN * x + z, gamma * pen_scal);
+    y = vec_shrink(beta*Dx(N * x) + z, gamma * pen_scal);
     
     % Normalize y (if necessary).
     tmp = max(0, norm(y) - beta);
@@ -110,7 +112,7 @@ for iter=1:maxits
     %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     
     % Compute RHS.
-    b = DN'*(beta*y - z); 
+    b = N'*Dtx(beta*y - z); 
     
     %if (size(B,2)==1)    %% K=2
         
@@ -136,7 +138,8 @@ for iter=1:maxits
     % (according to the formula z_k+1 = z_k + beta*(N*x_k+1 - y_k+1) ).
     %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     %zold = z;
-    z = real(z + beta*(DN*x - y));
+    r = Dx(N*x) - y;
+    z = real(z + beta*r);
     
     %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     % Check stopping criteria.
@@ -146,7 +149,7 @@ for iter=1:maxits
     % Primal constraint violation.
     %----------------------------------------------------------------
     % Primal residual.
-    r = DN*x - y;    
+    %r = DN*x - y;    
     % l2 norm of the residual.
     dr = norm(r);
 	

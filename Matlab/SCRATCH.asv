@@ -120,14 +120,9 @@ D = eye(p);
 plot(DVs)
 nnz(DVs)
 %% Call old solver.
-[DVs,~,~,~,~,~]=SZVD_01(train,gamma,D,penalty,scaling,tol,maxits,beta,1);
+[DVs2,~,~,~,~,~]=SZVD_01(train,gamma,D,penalty,scaling,tol,maxits,beta,1);
 
 plot(DVs2)
 nnz(DVs2)
 
-%% Compare.
-errs = zeros(k-1,1);
-for i = 1:(k-1)
-    errs(i) = min([norm(DVs(:,i) - DVs2(:,i));norm(DVs(:,i) + DVs2(:,i))] );
-end
-errs
+min(

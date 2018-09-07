@@ -13,7 +13,7 @@ else
 end
 w0.s=s;
 %w0.B = 1/2*(w0.B + w0.B');
-B0 = w0.N' * w0.B * w0.N;
+%B0 = w0.N' * w0.B * w0.N;
 d1 = w0.dvs(:,1);
 B0 = (w0.N' * w0.B * w0.N)/(d1'*w0.B*d1);
 B0 = (B0+B0')/2;
@@ -23,10 +23,19 @@ K=w0.k;
 DVs=zeros(p,K-1);
 its=zeros(1,K-1);
 
+% Define d operators.
+if isdiag(D)
+    Dx = @(x) diag(D).*x; % diagonal scaling is D is diagonal.
+    Dtx = @(x) diag(D).*x; 
+else
+    Dx = @(x) D*x;
+    Dtx = @(x) D'*x;
+end
+
 %Call ADMM
 
 % Initial solutions.
-sols0.x = N'*D'*w0.dvs(:,1);
+sols0.x = N'*Dtx(w0.dvs(:,1));
 sols0.y = w0.dvs(:,1);
 sols0.z = zeros(p,1);
 
@@ -34,8 +43,8 @@ for i=1:(K-1)
     %Initial solutions.
    
     [x,~,~,its]=SZVD_ADMM(B0,N,D,sols0,s,gamma(i),beta,tol,maxits,quiet);
-   
-    DVs(:,i)=D*N*x;
+    
+    DVs(:,i)=Dx(N*x);
     DVs(:,i) = DVs(:,i)/norm(DVs(:,i));
     its(i)=its;
     if (quiet == 0)          
@@ -63,14 +72,14 @@ for i=1:(K-1)
         % Project back to the original space.
         d1 = N * w;
         
-        sols0.y = D*d1;
+        sols0.y = Dx(d1);
         sols0.x = w;        
         sols0.z = zeros(p,1);
         
         % Rescale B0.
         B0 = B0/(d1'*w0.B*d1);
         
-        eigs(B0)
+        %eigs(B0)
     end
    
 end
