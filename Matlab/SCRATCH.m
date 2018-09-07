@@ -121,7 +121,7 @@ D = eye(p);
 plot(DVs)
 nnz(DVs)
 %% Call old solver.
-[DVs2,~,~,~,~,~]=SZVD_00(train,gamma,D,penalty,scaling,tol,maxits,beta,quiet);
+[DVs2,~,~,~,~,~]=SZVD_01(train,gamma,D,penalty,scaling,tol,maxits,beta,1);
 
 plot(DVs2)
 nnz(DVs2)
