@@ -2,7 +2,7 @@
 
 p = 500;
 r = 0.25;
-k = 4;
+k = 3;
 N = 100*ones(k,1);
 
 [obs,mu,sigma]=type1_data(p,r,k,N);
@@ -18,7 +18,7 @@ T = 3;
 
 %% TEST TIME COMPARE 1.
 k = 4;
-p = [1500];
+p = 500;
 N = 50*ones(k,length(p));
 Ntest = 100*ones(k, length(p));
 T = 1;

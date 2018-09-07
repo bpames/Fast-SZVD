@@ -7,7 +7,7 @@ function [time1,time2, NumErr1, NumErr2, NumFeat1, NumFeat2]=time_compare_1(p,r,
 %T: number of trials for p
 
 %prepare the data set
-gamma=1e-8;
+gammascale=0.5;
 penalty=0;
 scaling=1;
 beta=3;
@@ -44,7 +44,9 @@ for i=1:length(p)
     fprintf('+++++++++++++++++++++++++++++++++++\n')
         % Solve using new version and record cpu time.
         tic;
-        [DVs,~,~,~,classMeans] = SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gamma);
+        [DVs,~,~,~,~,classMeans,gamma] = SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gammascale);
+        
+        gamma
         time1(j, i) =toc; % Stop timer after training is finished.
         
         %fprintf('new-test')
@@ -67,7 +69,8 @@ for i=1:length(p)
         %fprintf('old')
         %Repeat using the old code and save results to remaining matrices.
         tic;
-        [DVs2,~,~,~,~,~]=SZVD_00(train,gamma,D,penalty,scaling,tol,maxits,beta,quiet);
+        [DVs2,~,~,~,~,~]=SZVD_01(train,gamma,D,penalty,scaling,tol,maxits,beta,1);
+
         time2(j, i) =toc;
         
         %fprintf('old-test')
