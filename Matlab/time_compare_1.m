@@ -1,10 +1,12 @@
-function [time1,time2, NumErr1, NumErr2, NumFeat1, NumFeat2]=time_compare_1(p,r,k,N,Ntest, T)
+function [time1,time2, NumErr1, NumErr2, NumFeat1, NumFeat2]=time_compare_1(p,r,k,N,Ntest, T, savemat)
 %p: vector of number of features
 %r: value of constant covariance between features
 %k: number of classes
 %N: array of vectors of number of training observations per class.
 %Ntest: array of vector of number of testing observations per class.
 %T: number of trials for p
+%savemat: logical indicating whether to save intermediate workspace to
+%file.
 
 %prepare the data set
 gammascale=0.5;
@@ -45,8 +47,7 @@ for i=1:length(p)
         % Solve using new version and record cpu time.
         tic;
         [DVs,~,~,~,~,classMeans,gamma] = SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gammascale);
-        
-        gamma
+              
         time1(j, i) =toc; % Stop timer after training is finished.
         
         %fprintf('new-test')
@@ -78,8 +79,14 @@ for i=1:length(p)
         NumErr2(j,i)=stats.mc;
         NumFeat2(j,i)=sum(stats.l0);
         
+        % Print intermediate stats.
         fprintf('-----------------------------------\n')
         fprintf('Total old %1.4f \n', time2(j,i))
+        
+        % Save workspace if desired.
+        if savemat
+            save('timecompareres.mat')
+        end
     end
 end
 
