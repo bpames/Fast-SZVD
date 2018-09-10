@@ -23,6 +23,10 @@ quiet=1;
 time1 = zeros(T, length(p));
 time2=time1;NumErr1=time1;NumErr2=time1;NumFeat1=time1;NumFeat2 = time1;
 
+% Set up timing table
+fprintf('+++++++++++++++++++++++++++++++++++\n')
+fprintf('p   | New     | Old \n')
+fprintf('+++++++++++++++++++++++++++++++++++\n')
 
 for i=1:length(p)
     % Update dictionary matrix.
@@ -43,7 +47,7 @@ for i=1:length(p)
 %         sig_train=std(train_obs);
         
     %fprintf('new')
-    fprintf('+++++++++++++++++++++++++++++++++++\n')
+    
         % Solve using new version and record cpu time.
         tic;
         [DVs,~,~,~,~,classMeans,gamma] = SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gammascale);
@@ -61,13 +65,7 @@ for i=1:length(p)
         [stats,~,~,~]=test_ZVD_V1(DVs,test,classMeans);
         NumErr1(j,i)=stats.mc;
         NumFeat1(j,i)=sum(stats.l0);
-        
-        fprintf('-----------------------------------\n')
-        fprintf('Total new %1.4f \n', time1(j,i))
-        
-        fprintf('+++++++++++++++++++++++++++++++++++\n')
-        
-        %fprintf('old')
+                   
         %Repeat using the old code and save results to remaining matrices.
         tic;
         [DVs2,~,~,~,~,~]=SZVD_01(train,gamma,D,penalty,scaling,tol,maxits,beta,1);
@@ -80,11 +78,10 @@ for i=1:length(p)
         NumFeat2(j,i)=sum(stats.l0);
         
         % Print intermediate stats.
-        fprintf('-----------------------------------\n')
-        fprintf('Total old %1.4f \n', time2(j,i))
+        fprintf('%4d | %1.4f | %1.4f \n', p(i), time1(j,i), time2(j,i))
         
         % Save workspace if desired.
-        if savemat
+        if(savemat)
             save('timecompareres.mat')
         end
     end
