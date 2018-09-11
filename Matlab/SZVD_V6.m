@@ -3,6 +3,14 @@ function [DVs,x, its,pen_scal,N,classMeans, gamma]=SZVD_V6(train,D,penalty,tol,m
 %Normalize the training data
 get_DVs=1;
 
+% Define D operators.
+if isdiag(D)
+    Dx = @(x) diag(D).*x; % diagonal scaling is D is diagonal.
+    Dtx = @(x) diag(D).*x; 
+else
+    Dx = @(x) D*x;
+    Dtx = @(x) D'*x;
+end
 
 % st = 0;
 % ntime = 0;
@@ -47,15 +55,16 @@ if (get_DVs==1)
     %Compute k-1 nontrivial e-vectors of N'*B*N
     RN = R*N;
     %size(RN)
-    [~,sigma,w]=svd(RN);
+    %[~,sigma,w]=svd(RN);
+    [~,sigma,w]=svds(RN,1, 'largest');
     %size(w)
-    w=w(:,1);
+    %w=w(:,1);
     % normalize R.
     R=R/sigma(1,1);
     RN = RN/sigma(1,1);
     
     % Set gamma.
-    gamma(1)=gamscale*norm(RN*w,2)^2/norm((D*N*w),1);
+    gamma(1)=gamscale*norm(RN*w,2)^2/norm(Dx(N*w),1);
 end
 
 % ppt = toc;
@@ -72,14 +81,6 @@ DVs=zeros(p,K-1);
 its=zeros(1,K-1);
 %Call ADMM
 
-% Define d operators.
-if isdiag(D)
-    Dx = @(x) diag(D).*x; % diagonal scaling is D is diagonal.
-    Dtx = @(x) diag(D).*x; 
-else
-    Dx = @(x) D*x;
-    Dtx = @(x) D'*x;
-end
 
 for i=1:(K-1)
     %Initial solutions.

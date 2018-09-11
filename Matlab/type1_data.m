@@ -12,7 +12,7 @@ function [obs,mu,sigma]=type1_data(p,r,k,N, blocksize)
 mu=zeros(p,k);
  
 
-%mu_ij=0.7 if blocksize(i-1)+ 1 <=j<=blocksize*i
+%mu_ij=1 if blocksize(i-1)+ 1 <=j<=blocksize*i
 for i=1:k
     mu(((i-1)*blocksize+1):(blocksize*i),i)= ones(blocksize,1);
     %mu(1:l,i)=0.7*ones(l,1);
