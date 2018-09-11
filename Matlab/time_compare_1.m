@@ -1,7 +1,8 @@
-function [time1,time2, NumErr1, NumErr2, NumFeat1, NumFeat2]=time_compare_1(p,r,k,N,Ntest, T, savemat)
+function [time1,time2, NumErr1, NumErr2, NumFeat1, NumFeat2]=time_compare_1(p,r,k,blocksize, N,Ntest, T, savemat)
 %p: vector of number of features
 %r: value of constant covariance between features
 %k: number of classes
+%blocksize: size of each block of values distinguishing class-means.
 %N: array of vectors of number of training observations per class.
 %Ntest: array of vector of number of testing observations per class.
 %T: number of trials for p
@@ -37,7 +38,7 @@ for i=1:length(p)
     for j=1:T
         
         % Generate  and process (i,j)th training data.                        
-        train = type1_data(p(i),r,k,N(:, i)); 
+        train = type1_data(p(i),r,k,N(:, i), blocksize(i)); 
         [train_obs, mu_train, sig_train] = normalize(train(:,2:(p(i)+1)));
         train=[train(:,1), train_obs];
         
@@ -49,6 +50,7 @@ for i=1:length(p)
     %fprintf('new')
     
         % Solve using new version and record cpu time.
+        %size(train)
         tic;
         [DVs,~,~,~,~,classMeans,gamma] = SZVD_V6(train,D,penalty,tol,maxits,beta,quiet,gammascale);
               
@@ -56,7 +58,7 @@ for i=1:length(p)
         
         %fprintf('new-test')
         % Sample and normalize test data.
-        test = type1_data(p(i),r,k,Ntest(:, i)); 
+        test = type1_data(p(i),r,k,Ntest(:, i), blocksize(i)); 
         test_obs=test(:,2:(p(i)+1));
         test_obs=normalize_test(test_obs,mu_train,sig_train);
         test(:, 2:(p(i)+1)) = test_obs ;

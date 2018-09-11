@@ -48,6 +48,7 @@ if (get_DVs==1)
     RN = R*N;
     %size(RN)
     [~,sigma,w]=svd(RN);
+    %size(w)
     w=w(:,1);
     % normalize R.
     R=R/sigma(1,1);
